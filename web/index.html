@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#faf9f6">
+  <title>Shorten · Less link. More possibility.</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <header class="site-header"><a class="brand" href="/" aria-label="Shorten home"><span class="brand-mark" aria-hidden="true">↗</span>shorten<span class="brand-dot">.</span></a><span class="header-note">Small links. Simple sharing.</span></header>
+  <main>
+    <section class="intro" aria-labelledby="heading">
+      <p class="eyebrow">A LITTLE LESS LINK</p>
+      <h1 id="heading">Long URL?<br>Keep it <em>short.</em></h1>
+      <p class="intro-copy">Turn a long address into a neat little link.<br>Ready to copy, share, and go.</p>
+    </section>
+    <section class="shorten-card" aria-label="Create a short link">
+      <form id="shorten-form">
+        <label for="url">Your destination URL</label>
+        <div class="input-row"><input id="url" name="url" type="url" placeholder="https://example.com/something-great" autocomplete="url" aria-describedby="url-hint form-status" required><button id="shorten-button" type="submit">Shorten <span aria-hidden="true">↗</span></button></div>
+        <p id="url-hint" class="hint">Use a full URL starting with http:// or https://</p>
+      </form>
+      <p id="form-status" class="status" role="status" aria-live="polite"></p>
+      <div id="result" class="result" hidden><div><span class="result-label">YOUR LINK IS READY</span><a id="short-link" href="/"></a></div><button id="copy-button" class="secondary" type="button">Copy link</button></div>
+      <noscript><p>Enable JavaScript to create links here, or use the JSON API described in the README.</p></noscript>
+    </section>
+    <section class="recent" aria-labelledby="recent-heading">
+      <div class="section-heading"><div><p class="eyebrow">THE LATEST</p><h2 id="recent-heading">Recent links</h2></div><button id="refresh-button" class="text-button" type="button">Refresh <span aria-hidden="true">↻</span></button></div>
+      <p class="recent-note">The 20 most recent links on this server. All links are public.</p>
+      <p id="list-status" class="hint" role="status" aria-live="polite">Loading recent links…</p>
+      <ul id="links" class="links" aria-label="Recent short links"></ul>
+    </section>
+  </main>
+  <footer><span>Made for the shorter route.</span><span>Simple by design.</span></footer>
+</body>
+</html>

@@ -10,12 +10,12 @@ Install Go 1.26 or newer, then run from the repository root:
 go run .
 ```
 
-Open <http://localhost:8080>. Go downloads module dependencies on the first run. The server creates `./data/shortener.db` and its parent directory automatically. Links and click counts persist across restarts. Stop with Ctrl+C.
+The server binds the first free port from **3000** upward (3001, 3002, …) and prints the exact URL. Open that address in your browser. Go downloads module dependencies on the first run. The server creates `./data/shortener.db` and its parent directory automatically. Links and click counts persist across restarts. Stop with Ctrl+C.
 
 ## Environment variables
 
-- `PORT`: listening port, default `8080`.
-- `BASE_URL`: public HTTP(S) origin used to build short links, default `http://localhost:8080`. Use an origin without a path, query, or fragment. Change this separately when changing the port.
+- `PORT`: optional fixed listening port. When unset, the next free port from 3000 upward is used.
+- `BASE_URL`: public HTTP(S) origin used to build short links. Defaults to `http://localhost:<bound-port>`. Use an origin without a path, query, or fragment. Set this when hosting behind a reverse proxy.
 - `DB_PATH`: SQLite file location, default `./data/shortener.db`.
 
 For example:
@@ -28,10 +28,10 @@ Use your public HTTPS origin for `BASE_URL` when hosting behind a reverse proxy.
 
 ## API examples
 
-Create a short link:
+Create a short link (replace the port with the one printed at startup):
 
 ```sh
-curl -i -X POST http://localhost:8080/api/shorten \
+curl -i -X POST http://localhost:3000/api/shorten \
   -H 'Content-Type: application/json' \
   -d '{"url":"https://example.com/a/long/path"}'
 ```
@@ -41,7 +41,7 @@ Returns HTTP 201 and a JSON object with `code`, `short_url`, `original_url`, `cr
 List the 20 most recent links, newest first:
 
 ```sh
-curl http://localhost:8080/api/links
+curl http://localhost:3000/api/links
 ```
 
 Returns a JSON array of link objects (or `[]`). All links are public to visitors of this server; avoid submitting private or sensitive URLs.
@@ -49,7 +49,7 @@ Returns a JSON array of link objects (or `[]`). All links are public to visitors
 Resolve a link (replace `Ab12Cd34` with a returned code):
 
 ```sh
-curl -i http://localhost:8080/Ab12Cd34
+curl -i http://localhost:3000/Ab12Cd34
 ```
 
 GET returns HTTP 302 with the original URL in `Location`, atomically increments the click count, and disables caching so future requests reach the server. HEAD resolves without counting a click. Unknown codes return a readable HTTP 404 page.
@@ -57,7 +57,7 @@ GET returns HTTP 302 with the original URL in `Location`, atomically increments 
 Health check:
 
 ```sh
-curl -i http://localhost:8080/health
+curl -i http://localhost:3000/health
 ```
 
 Returns HTTP 200 with `ok`.
@@ -70,7 +70,7 @@ go test ./...
 go vet ./...
 ```
 
-- `main.go`: configuration, HTTP timeouts, and graceful shutdown.
+- `main.go`: configuration, free-port binding, HTTP timeouts, and graceful shutdown.
 - `store.go`: validation, random codes, and parameterized SQLite queries.
 - `handlers.go`: routes, JSON responses, and embedded static assets.
 - `web/`: responsive interface with safe DOM text rendering and clipboard support.

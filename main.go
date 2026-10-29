@@ -3,7 +3,9 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"net/url"
 	"os"
@@ -21,13 +23,36 @@ func env(key, fallback string) string {
 	return fallback
 }
 
-func run() error {
-	port := env("PORT", "8080")
-	n, err := strconv.Atoi(port)
-	if err != nil || n < 1 || n > 65535 {
-		return errors.New("PORT must be a number from 1 to 65535")
+// listen opens PORT when set; otherwise the first free port from 3000 upward.
+func listen() (net.Listener, string, error) {
+	if port := os.Getenv("PORT"); port != "" {
+		n, err := strconv.Atoi(port)
+		if err != nil || n < 1 || n > 65535 {
+			return nil, "", errors.New("PORT must be a number from 1 to 65535")
+		}
+		ln, err := net.Listen("tcp", ":"+port)
+		if err != nil {
+			return nil, "", err
+		}
+		return ln, port, nil
 	}
-	baseURL, err := validateURL(env("BASE_URL", "http://localhost:8080"))
+	for port := 3000; port <= 65535; port++ {
+		ln, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
+		if err == nil {
+			return ln, strconv.Itoa(port), nil
+		}
+	}
+	return nil, "", errors.New("no free TCP port available from 3000 upward")
+}
+
+func run() error {
+	ln, port, err := listen()
+	if err != nil {
+		return err
+	}
+	defer ln.Close()
+
+	baseURL, err := validateURL(env("BASE_URL", "http://localhost:"+port))
 	if err != nil {
 		return errors.New("BASE_URL must be an absolute HTTP or HTTPS URL with a valid hostname")
 	}
@@ -41,10 +66,12 @@ func run() error {
 	}
 	defer app.db.Close()
 	server := &http.Server{
-		Addr: ":" + port, Handler: app.handler(),
-		ReadHeaderTimeout: 5 * time.Second, ReadTimeout: 10 * time.Second,
-		WriteTimeout: 15 * time.Second, IdleTimeout: 60 * time.Second,
-		MaxHeaderBytes: 1 << 20,
+		Handler:           app.handler(),
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       10 * time.Second,
+		WriteTimeout:      15 * time.Second,
+		IdleTimeout:       60 * time.Second,
+		MaxHeaderBytes:    1 << 20,
 	}
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -57,7 +84,7 @@ func run() error {
 		}
 	}()
 	log.Printf("Listening on http://localhost:%s (short links: %s)", port, app.baseURL)
-	if err := server.ListenAndServe(); !errors.Is(err, http.ErrServerClosed) {
+	if err := server.Serve(ln); !errors.Is(err, http.ErrServerClosed) {
 		return err
 	}
 	return nil

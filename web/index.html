@@ -2,37 +2,81 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#faf9f6">
+  <meta name="viewport" content="width=device-width, initial-scale=1, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#F8FAFC">
+  <meta name="description" content="Turn long URLs into neat short links. Copy, share, and go.">
   <title>Shorten · Less link. More possibility.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css">
   <script src="/static/app.js" defer></script>
 </head>
 <body>
-  <header class="site-header"><a class="brand" href="/" aria-label="Shorten home"><span class="brand-mark" aria-hidden="true">↗</span>shorten<span class="brand-dot">.</span></a><span class="header-note">Small links. Simple sharing.</span></header>
+  <div class="atmosphere" aria-hidden="true"></div>
+  <header class="site-header">
+    <a class="brand" href="/" aria-label="Shorten home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
+      </span>
+      shorten<span class="brand-dot">.</span>
+    </a>
+    <span class="header-note">Small links. Simple sharing.</span>
+  </header>
+
   <main>
     <section class="intro" aria-labelledby="heading">
-      <p class="eyebrow">A LITTLE LESS LINK</p>
+      <p class="eyebrow">A little less link</p>
       <h1 id="heading">Long URL?<br>Keep it <em>short.</em></h1>
       <p class="intro-copy">Turn a long address into a neat little link.<br>Ready to copy, share, and go.</p>
     </section>
-    <section class="shorten-card" aria-label="Create a short link">
-      <form id="shorten-form">
+
+    <section class="shorten-panel" aria-label="Create a short link">
+      <form id="shorten-form" novalidate>
         <label for="url">Your destination URL</label>
-        <div class="input-row"><input id="url" name="url" type="url" placeholder="https://example.com/something-great" autocomplete="url" aria-describedby="url-hint form-status" required><button id="shorten-button" type="submit">Shorten <span aria-hidden="true">↗</span></button></div>
+        <div class="input-row">
+          <input id="url" name="url" type="url" placeholder="https://example.com/something-great" autocomplete="url" inputmode="url" spellcheck="false" aria-describedby="url-hint form-status" required>
+          <button id="shorten-button" type="submit">
+            <span class="btn-label">Shorten</span>
+            <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7"/><path d="M8 7h9v9"/></svg>
+          </button>
+        </div>
         <p id="url-hint" class="hint">Use a full URL starting with http:// or https://</p>
       </form>
       <p id="form-status" class="status" role="status" aria-live="polite"></p>
-      <div id="result" class="result" hidden><div><span class="result-label">YOUR LINK IS READY</span><a id="short-link" href="/"></a></div><button id="copy-button" class="secondary" type="button">Copy link</button></div>
-      <noscript><p>Enable JavaScript to create links here, or use the JSON API described in the README.</p></noscript>
+      <div id="result" class="result" hidden>
+        <div>
+          <span class="result-label">Your link is ready</span>
+          <a id="short-link" href="/"></a>
+        </div>
+        <button id="copy-button" class="secondary" type="button">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span class="copy-label">Copy link</span>
+        </button>
+      </div>
+      <noscript><p class="hint">Enable JavaScript to create links here, or use the JSON API described in the README.</p></noscript>
     </section>
+
     <section class="recent" aria-labelledby="recent-heading">
-      <div class="section-heading"><div><p class="eyebrow">THE LATEST</p><h2 id="recent-heading">Recent links</h2></div><button id="refresh-button" class="text-button" type="button">Refresh <span aria-hidden="true">↻</span></button></div>
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">The latest</p>
+          <h2 id="recent-heading">Recent links</h2>
+        </div>
+        <button id="refresh-button" class="text-button" type="button" aria-label="Refresh recent links">
+          Refresh
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.6-6.4"/><path d="M21 3v6h-6"/></svg>
+        </button>
+      </div>
       <p class="recent-note">The 20 most recent links on this server. All links are public.</p>
       <p id="list-status" class="hint" role="status" aria-live="polite">Loading recent links…</p>
       <ul id="links" class="links" aria-label="Recent short links"></ul>
     </section>
   </main>
-  <footer><span>Made for the shorter route.</span><span>Simple by design.</span></footer>
+
+  <footer>
+    <span>Made for the shorter route.</span>
+    <span>Simple by design.</span>
+  </footer>
 </body>
 </html>
